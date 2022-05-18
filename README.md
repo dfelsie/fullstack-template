@@ -1,0 +1,2 @@
+# Typescript fullstack app template
+
