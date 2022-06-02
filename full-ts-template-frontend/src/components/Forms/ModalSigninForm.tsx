@@ -10,7 +10,12 @@ import {
 import axios from "../../utils/axios";
 import { Field, Form, Formik } from "formik";
 
-export default function ModalSignInForm() {
+type Props = {
+  setUserName: (value: string) => void;
+  closeModal: () => void;
+};
+
+export default function ModalSignInForm({ setUserName, closeModal }: Props) {
   function validateName(value) {
     let error;
     if (!value) {
@@ -23,14 +28,23 @@ export default function ModalSignInForm() {
     <Formik
       initialValues={{ email: "", password: "" }}
       onSubmit={async (values, actions) => {
-        /* await axios
-          .post("http://localhost:5000/api/v1/auth/login", {
-            ...values,
+        await axios
+          .post("http://localhost:8000/api/v1/auth/login", {
+            email: values.email,
+            password: values.password,
+          })
+          .then((res) => {
+            console.log(res, "Login Response");
+            if (res.status === 200 && res.data.name) {
+              setUserName(res.data.name);
+              //closeModal();
+            }
+            //window.location.reload();
           })
           .catch((err) => {
             //console.log(err);
           });
-        return; */
+        return;
       }}
     >
       {(props) => (

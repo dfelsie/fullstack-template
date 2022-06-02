@@ -1,16 +1,27 @@
-import Wrapper from "../components/Wrapper";
-import { Center } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
+import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import isLoggedIn from "../utils/useIsLoggedIn";
+import ProfileCard from "../../components/ProfileCard";
+import Wrapper from "../../components/Wrapper";
+import isLoggedIn from "../../utils/useIsLoggedIn";
 
-const Index = () => {
+type Props = {};
+
+export default function user({}: Props) {
+  const router = useRouter();
+  let { userName } = router.query;
+  if (typeof userName !== "string") {
+    userName = "Default User";
+  }
   const [currentUserName, setCurrentUsername] = React.useState(null);
   const [requestLoading, setRequestLoading] = React.useState(true);
   useEffect(() => {
     isLoggedIn().then((res: AxiosResponse) => {
       if (res.data.name) {
         setCurrentUsername(res.data.name);
+        const router = useRouter();
+        router.push("/");
       }
       setRequestLoading(false);
     });
@@ -24,11 +35,7 @@ const Index = () => {
       currentUserName={currentUserName}
       setCurrentUserName={setCurrentUsername}
     >
-      <Center flexDir={"column"}>
-        <h1>Hello World!!</h1>
-      </Center>
+      <ProfileCard userName={userName}></ProfileCard>
     </Wrapper>
   );
-};
-
-export default Index;
+}

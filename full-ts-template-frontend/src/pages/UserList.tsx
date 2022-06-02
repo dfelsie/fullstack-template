@@ -1,10 +1,19 @@
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Center,
+  Flex,
+  Heading,
+  Text,
+  List,
+  ListItem,
+} from "@chakra-ui/react";
 import Wrapper from "../components/Wrapper";
-import { Center } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
-import React, { useEffect } from "react";
 import isLoggedIn from "../utils/useIsLoggedIn";
 
-const Index = () => {
+type Props = {};
+export default function UserList({}: Props) {
   const [currentUserName, setCurrentUsername] = React.useState(null);
   const [requestLoading, setRequestLoading] = React.useState(true);
   useEffect(() => {
@@ -18,17 +27,25 @@ const Index = () => {
   if (requestLoading) {
     return <></>;
   }
-
   return (
     <Wrapper
       currentUserName={currentUserName}
       setCurrentUserName={setCurrentUsername}
     >
       <Center flexDir={"column"}>
-        <h1>Hello World!!</h1>
+        <Heading>User List</Heading>
+        <List>
+          <ListItem>
+            <Text>User 1</Text>
+          </ListItem>
+          <ListItem>
+            <Text>User 2</Text>
+          </ListItem>
+          <ListItem>
+            <Text>User 3</Text>
+          </ListItem>
+        </List>
       </Center>
     </Wrapper>
   );
-};
-
-export default Index;
+}

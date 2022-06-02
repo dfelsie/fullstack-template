@@ -7,10 +7,15 @@ import {
   Flex,
   Box,
 } from "@chakra-ui/react";
-import axios from "axios";
+import axios from "../../utils/axios";
 import { Field, Form, Formik } from "formik";
 
-export default function ModalSignUpForm() {
+type Props = {
+  setUserName: (value: string) => void;
+  closeModal: () => void;
+};
+
+export default function ModalSignUpForm({ setUserName, closeModal }: Props) {
   function validateName(value) {
     let error;
     if (!value) {
@@ -23,14 +28,23 @@ export default function ModalSignUpForm() {
     <Formik
       initialValues={{ email: "", username: "", password: "" }}
       onSubmit={async (values, actions) => {
-        /* await axios
-          .post("http://localhost:5000/api/v1/auth/register", {
-            ...values,
+        await axios
+          .post("http://localhost:8000/api/v1/auth/register", {
+            email: values.email,
+            name: values.username,
+            password: values.password,
+          })
+          .then((res) => {
+            console.log(res, "Login Response");
+            if (res.status === 200 && res.data?.name) {
+              setUserName(res.data.name);
+              closeModal();
+            }
           })
           .catch((err) => {
             //console.log(err);
           });
-        return; */
+        return;
       }}
     >
       {(props) => (
