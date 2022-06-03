@@ -152,6 +152,24 @@ app.get("/api/v1/data/sensitive", isLoggedIn, (req: Request, res: Response) => {
   res.send("Sensitive data");
 });
 
+app.get("/api/v1/data/userlist", (req: Request, res: Response) => {
+  const userList = prisma.user
+    .findMany({
+      take: 10,
+    })
+    .then((userList) => {
+      const userNameArray: string[] = [];
+      userList.forEach((user) => {
+        userNameArray.push(user?.name);
+      });
+      res.json(userNameArray);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json(err);
+    });
+});
+
 passport.use(
   "register",
   new PassportLocal.Strategy(
