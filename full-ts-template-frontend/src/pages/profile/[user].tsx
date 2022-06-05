@@ -4,13 +4,13 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import ProfileCard from "../../components/ProfileCard";
 import Wrapper from "../../components/Wrapper";
-import isLoggedIn from "../../utils/useIsLoggedIn";
+import isLoggedIn from "../../utils/isLoggedIn";
 
 type Props = {};
 
 export default function user({}: Props) {
   const router = useRouter();
-  let { userName } = router.query;
+  let userName = router.query.user;
   if (typeof userName !== "string") {
     userName = "Default User";
   }
@@ -18,10 +18,9 @@ export default function user({}: Props) {
   const [requestLoading, setRequestLoading] = React.useState(true);
   useEffect(() => {
     isLoggedIn().then((res: AxiosResponse) => {
+      console.log(res);
       if (res.data.name) {
         setCurrentUsername(res.data.name);
-        const router = useRouter();
-        router.push("/");
       }
       setRequestLoading(false);
     });

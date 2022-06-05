@@ -18,7 +18,7 @@ import React, { useEffect } from "react";
 import { useQuery } from "react-query";
 import Wrapper from "../components/Wrapper";
 import axios from "../utils/axios";
-import useIsLoggedIn from "../utils/useIsLoggedIn";
+import useIsLoggedIn from "../utils/isLoggedIn";
 import { useRouter } from "next/router";
 import { EditIcon } from "@chakra-ui/icons";
 import ModalSigninForm from "../components/Forms/ModalSigninForm";
@@ -26,13 +26,15 @@ import ModalEditTextForm from "../components/Forms/ModalEditTextForm";
 
 type Props = {
   userName: string;
+  bio: string;
 };
 
 ProfileCard.defaultProps = {
   userName: "Default User",
+  bio: "Default bio",
 };
 
-export default function ProfileCard({ userName: user }: Props) {
+export default function ProfileCard({ userName, bio }: Props) {
   //const { isLoading, data, error } = useIsLoggedIn();
   return (
     <Flex
@@ -47,7 +49,7 @@ export default function ProfileCard({ userName: user }: Props) {
     >
       <Flex flexDir={"column"} alignItems={"center"}>
         <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
-        <Heading>{user}</Heading>
+        <Heading>{userName}</Heading>
         <Heading>NVM It's Segun Adebayo</Heading>
       </Flex>
 
@@ -59,7 +61,7 @@ export default function ProfileCard({ userName: user }: Props) {
             borderRadius={"5px"}
             h="100px"
           >
-            <Text>{"Default User Bio"}</Text>
+            <Text>{bio}</Text>
           </Flex>
         </ListItem>
 

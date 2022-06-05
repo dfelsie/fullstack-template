@@ -2,7 +2,7 @@ import Wrapper from "../components/Wrapper";
 import { Center } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import React, { useEffect } from "react";
-import isLoggedIn from "../utils/useIsLoggedIn";
+import isLoggedIn from "../utils/isLoggedIn";
 
 const Index = () => {
   const [currentUserName, setCurrentUsername] = React.useState(null);

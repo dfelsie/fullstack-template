@@ -3,16 +3,19 @@ import dotenv from "dotenv";
 import argon2 from "argon2";
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
-import * as PassportLocal from "passport-local";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import passport from "passport";
 import morgan from "morgan";
+import { v4 } from "uuid";
 
 import connectRedis from "connect-redis";
 const RedisStore = connectRedis(session);
 import Redis from "ioredis";
-import { isLoggedIn, isNotLoggedIn } from "./middleware/auth";
+import { FORGET_PASSWORD_PREFIX } from "../constants";
+import sendEmail from "../utils/sendMail";
+import getUserData from "../utils/getUserData";
+import checkLoggedIn from "../utils/checkLoggedIn";
+import makeUserDataFromUser from "../utils/makeUserDataFromUser";
 
 dotenv.config();
 
@@ -23,7 +26,6 @@ const corsOptions: cors.CorsOptions = {
   origin: "http://localhost:3031",
   credentials: true,
 };
-app.use(passport.initialize());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -54,7 +56,6 @@ app.use(
     },
   })
 );
-app.use(passport.session());
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -91,66 +92,97 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/api/v1/auth/isloggedin", async (req: Request, res: Response) => {
-  if (await client.exists("userName")) {
-    const useName = await client.get("userName");
-    if (typeof useName === "string") {
-      res.json(JSON.parse(useName));
-
-      return;
-    }
+  const userData = await getUserData(client);
+  console.log(userData);
+  if (userData) {
+    res.send(userData);
   } else {
-    res.json({ name: false });
+    res.send(null);
   }
-
-  //return req.user ? res.send(req.user) : res.send(false);
 });
 
-passport.use(
-  new PassportLocal.Strategy(
-    {
-      usernameField: "email",
-      passwordField: "password",
-    },
-
-    async function (username, password, done) {
-      // look for the user data
-      await prisma.user
-        .findFirst({
-          where: {
-            email: username,
-          },
-        })
-        .then(async (user) => {
-          if (!user) return done(null, false);
-          if (!(await argon2.verify(user.password, password)))
-            return done(null, false);
-          return done(null, user);
-        })
-        .catch((err) => {
-          console.log(err);
-          return done(err);
-        });
-    }
-  )
-);
-
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-passport.deserializeUser((user: any, done) => {
-  done(null, user);
-});
-
-app.get("/api/v1/auth/logout", (req: Request, res: Response) => {
-  req.logout();
-  client.del("userName");
-
+app.get("/api/v1/auth/logout", async (req: Request, res: Response) => {
+  //req.logout();
+  await client.del("userData");
   res.send("Logged out");
 });
 
-app.get("/api/v1/data/sensitive", isLoggedIn, (req: Request, res: Response) => {
-  res.send("Sensitive data");
+app.get("/api/v1/data/sensitive", async (req: Request, res: Response) => {
+  if (await getUserData(client)) return res.send("Sensitive data");
+  return res.send("Not logged in");
 });
+
+app.post("/api/v1/auth/changepassword", async (req: Request, res: Response) => {
+  if (await getUserData(client)) return res.send("Already logged in");
+  if (
+    !req.body.newPassword ||
+    !req.body.token ||
+    req.body.newPassword.length < 4
+  ) {
+    res.status(400).send("Bad request");
+  }
+  const token = req.body.token;
+  const newPassword = req.body.newPassword;
+  const key = FORGET_PASSWORD_PREFIX + token;
+  const userID = await client.get(key);
+  if (!userID) {
+    res.status(400).send("Bad request");
+    return;
+  }
+  const userIDNum = parseInt(userID);
+  const user = await prisma.user.findFirst({ where: { id: userIDNum } });
+
+  if (!user) {
+    res.status(400).send("Bad request");
+    return;
+  }
+
+  //await em.persistAndFlush(user);
+  await prisma.user.update({
+    where: {
+      id: userIDNum,
+    },
+    data: {
+      password: await argon2.hash(newPassword),
+    },
+  });
+  await client.del(key);
+  //Log in after change password
+  return res.send("Password changed");
+});
+
+app.post(
+  "/api/v1/auth/requestpasswordchange",
+
+  async (req: Request, res: Response) => {
+    if (await getUserData(client)) return res.send("Already logged in");
+    if (!req.body.email) {
+      res.send("Please enter an email");
+    }
+    const userEmail = req.body.email;
+    const user = await prisma.user.findFirst({
+      where: { email: req.body.email },
+    });
+    if (!user) {
+      return res.send("User not found");
+    }
+
+    const token = v4();
+    await client.set(
+      FORGET_PASSWORD_PREFIX + token,
+      user.id,
+      "EX",
+      1000 * 60 * 60 * 24 * 3
+    );
+
+    sendEmail(
+      userEmail,
+      `<a href=http://localhost:3031/change-password/${token}> Reset Password</a>`
+    );
+    console.log(userEmail);
+    return res.send("Email sent");
+  }
+);
 
 app.get("/api/v1/data/userlist", (req: Request, res: Response) => {
   const userList = prisma.user
@@ -170,43 +202,94 @@ app.get("/api/v1/data/userlist", (req: Request, res: Response) => {
     });
 });
 
-passport.use(
-  "register",
-  new PassportLocal.Strategy(
-    {
-      usernameField: "email",
-      passwordField: "password",
+app.get("/api/v1/data/me", async (req: Request, res: Response) => {
+  const userData = await getUserData(client);
+  if (userData) {
+    res.send(userData);
+  } else {
+    res.send(null);
+  }
+});
+
+app.post("/api/v1/data/addblog", async (req: Request, res: Response) => {
+  const currUserData = await getUserData(client);
+  if (!currUserData) return res.send("Not logged in");
+  if (!req.body.title || !req.body.content) {
+    res.status(400).send("Bad request");
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email: currUserData.email,
     },
-    async function (username, _, done) {
-      // look for the user data
-      await prisma.user
-        .findFirst({
-          where: {
-            email: username,
-          },
-        })
-        .then((user) => {
-          if (!user) {
-            return done(null, true);
-          }
-          return done(null, false);
-        })
-        .catch((err) => {
-          console.log(err);
-          return done(err);
-        });
-    }
-  )
-);
+  });
+  if (user === null) {
+    return res.send("Odd error");
+  }
 
-app.post(
-  "/api/v1/auth/login",
-  passport.authenticate("local"),
-  async (req: Request, res: Response) => {
-    client.set("userName", JSON.stringify(req.user));
-    res.json(req.user).status(200);
+  const post = await prisma.post.create({
+    data: {
+      title: req.body.title,
+      content: req.body.content,
+      author: {
+        connect: {
+          id: user.id,
+        },
+      },
+    },
+  });
+  res.send(post).status(200);
 
-    /*  const { email, password } = req.body;
+  /* const user = await prisma.user.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    }); */
+});
+
+app.post("/api/v1/data/userdata", async (req: Request, res: Response) => {
+  if (!req.body.userName) {
+    res.status(400).send("Bad request");
+  }
+  const user = await prisma.user.findFirst({
+    where: {
+      name: req.body.userName,
+    },
+  });
+  if (!user) {
+    res.status(400).send("Bad request");
+    return;
+  }
+
+  const userData = { name: user.name };
+  res.json(userData);
+});
+
+app.post("/api/v1/auth/login", async (req: Request, res: Response) => {
+  if (await checkLoggedIn(client)) return res.send("Already logged in");
+
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send("Bad request");
+  }
+  const user = await prisma.user.findFirst({
+    where: {
+      email: req.body.email,
+    },
+  });
+  if (!user) {
+    return res.status(400).send("Bad request");
+  }
+  const passwordHash = await argon2.hash(req.body.password);
+  if (!argon2.verify(user.password, passwordHash)) {
+    console.log("Bad request");
+    return res.status(400).send("Bad request");
+  }
+
+  client.set("userData", JSON.stringify(makeUserDataFromUser(user)));
+
+  return res.json(user).status(200);
+
+  /*  const { email, password } = req.body;
   if (
     !email ||
     !password ||
@@ -229,33 +312,36 @@ app.post(
   }
 
   return res.send(user); */
-  }
-);
+});
 
-app.post(
-  "/api/v1/auth/register",
-  isNotLoggedIn,
-  passport.authenticate("register"),
-  async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
-    const passwordHash = await argon2.hash(password);
-    try {
-      const result = await prisma.user.create({
-        data: {
-          name,
-          email,
-          password: passwordHash,
-        },
-      });
-      req.user = result;
-      client.set("userName", name);
-      res.header("Access-Control-Allow-Credentials", "true");
-      return res.send(result);
-    } catch (e) {
-      return res.status(400);
-    }
+app.post("/api/v1/auth/register", async (req: Request, res: Response) => {
+  if (await checkLoggedIn(client)) return res.send("Already logged in");
+
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).send("Bad request");
   }
-);
+  if (await prisma.user.findFirst({ where: { email } })) {
+    return res.status(400).send("User already exists");
+  }
+
+  const passwordHash = await argon2.hash(password);
+  try {
+    const result = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: passwordHash,
+      },
+    });
+
+    client.set("userData", JSON.stringify(makeUserDataFromUser(result)));
+    res.header("Access-Control-Allow-Credentials", "true");
+    return res.send(JSON.stringify(req.userData));
+  } catch (e) {
+    return res.status(400);
+  }
+});
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);

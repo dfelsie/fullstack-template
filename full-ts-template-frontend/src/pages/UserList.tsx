@@ -11,8 +11,9 @@ import {
 } from "@chakra-ui/react";
 import Wrapper from "../components/Wrapper";
 import { AxiosResponse } from "axios";
-import isLoggedIn from "../utils/useIsLoggedIn";
+import isLoggedIn from "../utils/isLoggedIn";
 import getUserList from "../utils/getUserList";
+import { default as NextLink } from "next/link";
 
 type Props = {};
 export default function UserList({}: Props) {
@@ -30,6 +31,7 @@ export default function UserList({}: Props) {
   useEffect(() => {
     getUserList().then((res: AxiosResponse) => {
       if (res.data) {
+        //console.log(res.data);
         setUserNameList(res.data);
       }
     });
@@ -45,9 +47,11 @@ export default function UserList({}: Props) {
       <Center flexDir={"column"}>
         <Heading>User List</Heading>
         <UnorderedList>
-          {userNameList.map((user) => (
-            <ListItem key={`UserNamed:${user}`}>
-              <Text fontSize={24}>{user}</Text>
+          {userNameList.map((user, index) => (
+            <ListItem key={`UserNamed:${user}${index}`}>
+              <NextLink href={`profile/${user}`}>
+                <Text fontSize={24}>{user}</Text>
+              </NextLink>
             </ListItem>
           ))}
         </UnorderedList>

@@ -36,6 +36,13 @@ export function makeNavBody(
         <Flex w={"20%"} justifyContent={"space-between"}>
           <Button onClick={onSigninModalOpen}>Sign In</Button>
           <Button onClick={onSignupModalOpen}>Sign Up</Button>
+          <Button
+            onClick={() => {
+              sensitiveDataTest();
+            }}
+          >
+            Sensitive Data
+          </Button>
         </Flex>
 
         <Modal isOpen={signinModalIsOpen} onClose={onSigninModalClose}>

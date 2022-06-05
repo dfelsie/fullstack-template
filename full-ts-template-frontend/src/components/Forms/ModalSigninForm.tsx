@@ -9,6 +9,8 @@ import {
 } from "@chakra-ui/react";
 import axios from "../../utils/axios";
 import { Field, Form, Formik } from "formik";
+import { useState } from "react";
+import sendResetPasswordRequest from "../../utils/sendResetPasswordRequest";
 
 type Props = {
   setUserName: (value: string) => void;
@@ -16,12 +18,57 @@ type Props = {
 };
 
 export default function ModalSignInForm({ setUserName, closeModal }: Props) {
+  const [isResetPassword, setIsResetPassword] = useState(false);
+
   function validateName(value) {
     let error;
     if (!value) {
       error = "Name is required";
     }
     return error;
+  }
+
+  if (isResetPassword) {
+    return (
+      <Formik
+        initialValues={{ email: "" }}
+        onSubmit={(values, { setSubmitting }) => {
+          setSubmitting(true);
+          sendResetPasswordRequest(values.email)
+            .then(() => {
+              setSubmitting(false);
+              closeModal();
+            })
+            .catch(() => {
+              setSubmitting(false);
+            });
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <Field name="email" validate={validateName}>
+              {({ field, form }) => (
+                <FormControl isInvalid={form.errors.email}>
+                  <FormLabel htmlFor="name">Email</FormLabel>
+                  <Input id="email" placeholder="Email" {...field} />
+                  <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                </FormControl>
+              )}
+            </Field>
+            <Flex justifyContent="flex-end">
+              <Button
+                type="submit"
+                isLoading={isSubmitting}
+                colorScheme="teal"
+                variant="outline"
+              >
+                Send
+              </Button>
+            </Flex>
+          </Form>
+        )}
+      </Formik>
+    );
   }
 
   return (
@@ -84,6 +131,16 @@ export default function ModalSignInForm({ setUserName, closeModal }: Props) {
               type="submit"
             >
               Submit
+            </Button>
+            <Button
+              mt={4}
+              colorScheme="teal"
+              type="button"
+              onClick={async () => {
+                setIsResetPassword(true);
+              }}
+            >
+              Forget Password
             </Button>
           </Flex>
         </Form>

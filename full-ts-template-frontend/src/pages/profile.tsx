@@ -18,12 +18,12 @@ import React, { useEffect } from "react";
 import { useQuery } from "react-query";
 import Wrapper from "../components/Wrapper";
 import axios from "../utils/axios";
-import useIsLoggedIn from "../utils/useIsLoggedIn";
+import useIsLoggedIn from "../utils/isLoggedIn";
 import { useRouter } from "next/router";
 import { EditIcon } from "@chakra-ui/icons";
 import ModalSigninForm from "../components/Forms/ModalSigninForm";
 import ModalEditTextForm from "../components/Forms/ModalEditTextForm";
-import isLoggedIn from "../utils/useIsLoggedIn";
+import isLoggedIn from "../utils/isLoggedIn";
 import { AxiosResponse } from "axios";
 
 type Props = {};

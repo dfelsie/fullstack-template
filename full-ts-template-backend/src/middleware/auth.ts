@@ -1,14 +1,23 @@
 import { NextFunction, Request, Response } from "express";
+import getUserData from "../../utils/getUserData";
 
-export function isLoggedIn(req: Request, res: Response, next: NextFunction) {
-  if (req.user) {
-    return next();
+function checkForUserDataProps(user: any) {
+  if (!user.email || !user.id || !user.name) {
+    return null;
   }
-  res.send("Not logged in");
+  return { email: user.email, id: user.id, name: user.name };
 }
 
+/* export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
+  const userData=await getUserData(redisClient);
+  
+
+  if (await )
+  res.send("Not logged in");
+} */
+
 export function isNotLoggedIn(req: Request, res: Response, next: NextFunction) {
-  if (!req.user) {
+  if (!req.userData) {
     return next();
   }
   res.send("Already logged in");
