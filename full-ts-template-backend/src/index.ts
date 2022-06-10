@@ -154,6 +154,7 @@ app.post(
       return {
         author: userData.name,
         createdAt: blog.createdAt,
+        title: blog.title,
       };
     });
 

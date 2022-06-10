@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axios from "../axios";
 
 export default async function getUserDataWithBlogs(userName: string) {
   const response = axios

@@ -10,7 +10,7 @@ import {
 import axios from "../../utils/axios";
 import { Field, Form, Formik } from "formik";
 import { useState } from "react";
-import sendResetPasswordRequest from "../../utils/sendResetPasswordRequest";
+import sendResetPasswordRequest from "../../utils/requestUtils/sendResetPasswordRequest";
 
 type Props = {
   setUserName: (value: string) => void;

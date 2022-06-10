@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import axios from "./axios";
+import axios from "../axios";
 
 const isLoggedIn = async () => {
   const data = await axios

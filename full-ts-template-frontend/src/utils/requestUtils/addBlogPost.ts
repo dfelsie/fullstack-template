@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axios from "../axios";
 
 export default async function addBlogPost(
   blogContent: string,
@@ -6,8 +6,8 @@ export default async function addBlogPost(
 ) {
   return axios
     .post("http://localhost:8000/api/v1/data/addblog", {
-      content:blogContent,
-      title:blogTitle,
+      content: blogContent,
+      title: blogTitle,
     })
     .then((res) => {
       console.log(res);

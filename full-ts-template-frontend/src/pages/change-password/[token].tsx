@@ -2,8 +2,8 @@ import { AxiosResponse } from "axios";
 import { Formik, Form, Field } from "formik";
 import React, { useEffect } from "react";
 import Wrapper from "../../components/Wrapper";
-import sendResetPassword from "../../utils/sendResetPassword";
-import isLoggedIn from "../../utils/isLoggedIn";
+import sendResetPassword from "../../utils/requestUtils/sendResetPassword";
+import isLoggedIn from "../../utils/requestUtils/isLoggedIn";
 import { useRouter } from "next/router";
 import { Button } from "@chakra-ui/react";
 

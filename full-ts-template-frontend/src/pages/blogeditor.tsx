@@ -15,10 +15,10 @@ import {
 } from "@chakra-ui/react";
 import Wrapper from "../components/Wrapper";
 import { AxiosResponse } from "axios";
-import isLoggedIn from "../utils/isLoggedIn";
+import isLoggedIn from "../utils/requestUtils/isLoggedIn";
 import { useRouter } from "next/router";
-import goHomeIfLoggedout from "../utils/goHomeIfLoggedout";
-import addBlogPost from "../utils/addBlogPost";
+import goHomeIfLoggedout from "../utils/requestUtils/goHomeIfLoggedout";
+import addBlogPost from "../utils/requestUtils/addBlogPost";
 
 type Props = {};
 export default function Blogeditor({}: Props) {

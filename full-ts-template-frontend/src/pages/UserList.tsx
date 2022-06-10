@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import Wrapper from "../components/Wrapper";
 import { AxiosResponse } from "axios";
-import isLoggedIn from "../utils/isLoggedIn";
-import getUserList from "../utils/getUserList";
+import isLoggedIn from "../utils/requestUtils/isLoggedIn";
+import getUserList from "../utils/requestUtils/getUserList";
 import { default as NextLink } from "next/link";
 
 type Props = {};

@@ -4,9 +4,10 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import ProfileCard from "../../components/ProfileCard";
 import Wrapper from "../../components/Wrapper";
-import getBlogPosts from "../../utils/getBlogPosts";
-import getUserDataWithBlogs from "../../utils/getUserDataWithBlogs";
-import isLoggedIn from "../../utils/isLoggedIn";
+import getBlogPosts from "../../utils/requestUtils/getBlogPosts";
+import getUserDataWithBlogsMetadata from "../../utils/requestUtils/getUserDataWithBlogMetadata";
+import getUserDataWithBlogs from "../../utils/requestUtils/getUserDataWithBlogs";
+import isLoggedIn from "../../utils/requestUtils/isLoggedIn";
 
 type Props = {};
 
@@ -25,7 +26,7 @@ export default function user({}: Props) {
       //console.log(res);
       if (res.data.name) {
         setCurrentUsername(res.data.name);
-        getUserDataWithBlogs(res.data.name).then((res: AxiosResponse) => {
+        getUserDataWithBlogsMetadata(userName).then((res: AxiosResponse) => {
           if (res.data.blogs) {
             console.log(res.data);
             setUserBlogList(res.data.blogs);

@@ -15,7 +15,7 @@ import ModalSigninForm from "../Forms/ModalSigninForm";
 import ModalSignupForm from "../Forms/ModalSignupForm";
 import { default as NextLink } from "next/link";
 import sensitiveDataTest from "../../utils/test/sensitiveDataTest";
-import logout from "../../utils/logout";
+import logout from "../../utils/requestUtils/logout";
 import { makeNavBody } from "./NavbarUtils";
 
 type Props = {

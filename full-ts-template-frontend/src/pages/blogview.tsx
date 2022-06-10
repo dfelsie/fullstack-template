@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import Wrapper from "../components/Wrapper";
-import isLoggedIn from "../utils/isLoggedIn";
+import isLoggedIn from "../utils/requestUtils/isLoggedIn";
 
 type Props = {
   blogTitle: string;
