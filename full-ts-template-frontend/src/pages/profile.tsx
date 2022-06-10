@@ -31,6 +31,7 @@ type Props = {};
 export default function profile({}: Props) {
   const [bio, setBio] = React.useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [currentUserName, setCurrentUsername] = React.useState(null);
   const [requestLoading, setRequestLoading] = React.useState(true);
   useEffect(() => {

@@ -93,7 +93,6 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/api/v1/auth/isloggedin", async (req: Request, res: Response) => {
   const userData = await getUserData(client);
-  console.log(userData);
   if (userData) {
     res.send(userData);
   } else {
@@ -111,6 +110,61 @@ app.get("/api/v1/data/sensitive", async (req: Request, res: Response) => {
   if (await getUserData(client)) return res.send("Sensitive data");
   return res.send("Not logged in");
 });
+
+app.post(
+  "/api/v1/data/userdatawithblogs",
+  async (req: Request, res: Response) => {
+    const userName = req.body.userName;
+    console.log(req.body.userName);
+    if (!userName) return res.send("No user name");
+    const userData = await getUserData(client);
+    if (!userData) return res.send("Not logged in");
+    const blogs = await prisma.post.findMany({
+      where: {
+        authorId: {
+          equals: userData.id,
+        },
+      },
+    });
+    return res.json({
+      email: userData.email,
+      name: userData.name,
+      id: userData.id,
+      blogs: blogs,
+    });
+  }
+);
+
+app.post(
+  "/api/v1/data/userdatawithblogmetadata",
+  async (req: Request, res: Response) => {
+    const userName = req.body.userName;
+    console.log(req.body.userName);
+    if (!userName) return res.send("No user name");
+    const userData = await getUserData(client);
+    if (!userData) return res.send("Not logged in");
+    const blogs = await prisma.post.findMany({
+      where: {
+        authorId: {
+          equals: userData.id,
+        },
+      },
+    });
+    const blogsMetaData = blogs.map((blog) => {
+      return {
+        author: userData.name,
+        createdAt: blog.createdAt,
+      };
+    });
+
+    return res.json({
+      email: userData.email,
+      name: userData.name,
+      id: userData.id,
+      blogs: blogsMetaData,
+    });
+  }
+);
 
 app.post("/api/v1/auth/changepassword", async (req: Request, res: Response) => {
   if (await getUserData(client)) return res.send("Already logged in");
@@ -179,7 +233,6 @@ app.post(
       userEmail,
       `<a href=http://localhost:3031/change-password/${token}> Reset Password</a>`
     );
-    console.log(userEmail);
     return res.send("Email sent");
   }
 );
@@ -209,6 +262,22 @@ app.get("/api/v1/data/me", async (req: Request, res: Response) => {
   } else {
     res.send(null);
   }
+});
+
+app.post("/api/v1/data/getblogs", async (req: Request, res: Response) => {
+  if (!req.body.userName || typeof req.body.userName !== "string") {
+    res.send("Please enter a userName");
+  }
+  const userName = req.body.userName;
+  const blogs = await prisma.post.findMany({
+    where: {
+      author: {
+        name: userName,
+      },
+    },
+    take: 10,
+  });
+  res.json(blogs);
 });
 
 app.post("/api/v1/data/addblog", async (req: Request, res: Response) => {

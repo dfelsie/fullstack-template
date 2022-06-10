@@ -23,21 +23,18 @@ import { useRouter } from "next/router";
 import { EditIcon } from "@chakra-ui/icons";
 import ModalSigninForm from "../components/Forms/ModalSigninForm";
 import ModalEditTextForm from "../components/Forms/ModalEditTextForm";
-import Link from "next/link";
 
 type Props = {
   userName: string;
   bio: string;
-  userBlogList?: any[];
 };
 
 ProfileCard.defaultProps = {
   userName: "Default User",
   bio: "Default bio",
-  userBlogList: [],
 };
 
-export default function ProfileCard({ userName, bio, userBlogList }: Props) {
+export default function ProfileCard({ userName, bio }: Props) {
   //const { isLoading, data, error } = useIsLoggedIn();
   return (
     <Flex
@@ -70,15 +67,7 @@ export default function ProfileCard({ userName, bio, userBlogList }: Props) {
 
         <ListItem>
           <Text>Yet More Wacky Facts!</Text>
-          <List>
-            {userBlogList.map((blog: any) => (
-              <ListItem key={blog.id}>
-                {/* <Link href="blogview">
-                </Link> */}
-                <Text>{blog.title}</Text>
-              </ListItem>
-            ))}
-          </List>
+          <List></List>
         </ListItem>
       </List>
     </Flex>

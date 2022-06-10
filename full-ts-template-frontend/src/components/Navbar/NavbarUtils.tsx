@@ -9,7 +9,9 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Heading,
 } from "@chakra-ui/react";
+import Link from "next/link";
 import logout from "../../utils/logout";
 import sensitiveDataTest from "../../utils/test/sensitiveDataTest";
 import ModalSigninForm from "../Forms/ModalSigninForm";
@@ -99,7 +101,9 @@ export function makeNavBody(
           Logout
         </Button>
       </Flex>
-      <Box>Stuff</Box>;
+      <Link href={"userlist"}>
+        <Button>User List</Button>
+      </Link>
     </>
   );
 }
