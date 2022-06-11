@@ -72,6 +72,7 @@ export default function Blogeditor({}: Props) {
         <Button
           onClick={() => {
             addBlogPost(textValue, textHeadingValue);
+            router.push("/profile/" + currentUserName);
           }}
         >
           Submit Post

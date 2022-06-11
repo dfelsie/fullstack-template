@@ -71,11 +71,14 @@ export default function ProfileCard({ userName, bio, userBlogList }: Props) {
         <ListItem>
           <Text>Yet More Wacky Facts!</Text>
           <List>
-            {userBlogList.map((blog: any) => (
-              <ListItem key={blog.id}>
-                {/* <Link href="blogview">
-                </Link> */}
-                <Text>{blog.title}</Text>
+            {userBlogList.map((blog: any, index: number) => (
+              <ListItem key={`blogItemNumber${index}`}>
+                <Link
+                  key={`blogItemLink${index}`}
+                  href={`/blogview/${blog.id}`}
+                >
+                  <Text key={`blogItemTitle${index}`}>{blog.title}</Text>
+                </Link>
               </ListItem>
             ))}
           </List>

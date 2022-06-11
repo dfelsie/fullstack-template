@@ -9,19 +9,18 @@ import getUserDataWithBlogsMetadata from "../../utils/requestUtils/getUserDataWi
 import getUserDataWithBlogs from "../../utils/requestUtils/getUserDataWithBlogs";
 import isLoggedIn from "../../utils/requestUtils/isLoggedIn";
 
-type Props = {};
+type Props = {
+  userName: string;
+};
 
-export default function user({}: Props) {
-  const router = useRouter();
-  let userName: string;
-  //console.log(router.query.user);
-  if (typeof router.query.user !== "string") {
-    userName = "Default User";
-  }
+export default function User({ userName }: Props) {
+  console.log(userName);
   const [userBlogList, setUserBlogList] = React.useState<any[]>([,]);
   const [currentUserName, setCurrentUsername] = React.useState(null);
   const [requestLoading, setRequestLoading] = React.useState(true);
+  //let userName: string;
   useEffect(() => {
+    //userName = window.location.search.split("/")[2];
     isLoggedIn().then((res: AxiosResponse) => {
       //console.log(res);
       if (res.data.name) {
@@ -46,12 +45,21 @@ export default function user({}: Props) {
       setCurrentUserName={setCurrentUsername}
     >
       <ProfileCard
-        userName={userName}
+        userName={
+          typeof useRouter().query.userName === "string"
+            ? (useRouter().query.userName as string)
+            : ""
+        }
         userBlogList={userBlogList}
       ></ProfileCard>
     </Wrapper>
   );
 }
+
+User.getInitialProps = async (ctx: any) => {
+  const userName = ctx.query.user;
+  return { userName };
+};
 
 /* export const getStaticProps = async () => {
   const files = fs.readdirSync("posts");

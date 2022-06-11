@@ -9,14 +9,14 @@ import {
   ListItem,
 } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
-import Wrapper from "../components/Wrapper";
-import isLoggedIn from "../utils/requestUtils/isLoggedIn";
+import Wrapper from "../../components/Wrapper";
+import isLoggedIn from "../../utils/requestUtils/isLoggedIn";
 
 type Props = {
   blogTitle: string;
   blogContent: string;
 };
-export default function Blogview({ blogTitle, blogContent }: Props) {
+export default function Blog({ blogTitle, blogContent }: Props) {
   const [currentUserName, setCurrentUsername] = React.useState(null);
   const [requestLoading, setRequestLoading] = React.useState(true);
   useEffect(() => {

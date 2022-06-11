@@ -101,6 +101,9 @@ export function makeNavBody(
           Logout
         </Button>
       </Flex>
+      <Link href={"/blogeditor"}>
+        <Button>Blog Writer</Button>
+      </Link>
       <Link href={"userlist"}>
         <Button>User List</Button>
       </Link>

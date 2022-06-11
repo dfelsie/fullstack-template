@@ -121,15 +121,14 @@ app.post(
     if (!userData) return res.send("Not logged in");
     const blogs = await prisma.post.findMany({
       where: {
-        authorId: {
-          equals: userData.id,
+        authorName: {
+          equals: userName,
         },
       },
     });
     return res.json({
       email: userData.email,
       name: userData.name,
-      id: userData.id,
       blogs: blogs,
     });
   }
@@ -145,8 +144,8 @@ app.post(
     if (!userData) return res.send("Not logged in");
     const blogs = await prisma.post.findMany({
       where: {
-        authorId: {
-          equals: userData.id,
+        authorName: {
+          equals: userName,
         },
       },
     });
@@ -155,13 +154,13 @@ app.post(
         author: userData.name,
         createdAt: blog.createdAt,
         title: blog.title,
+        id: blog.id,
       };
     });
 
     return res.json({
       email: userData.email,
       name: userData.name,
-      id: userData.id,
       blogs: blogsMetaData,
     });
   }
@@ -303,18 +302,12 @@ app.post("/api/v1/data/addblog", async (req: Request, res: Response) => {
       content: req.body.content,
       author: {
         connect: {
-          id: user.id,
+          name: user.name,
         },
       },
     },
   });
   res.send(post).status(200);
-
-  /* const user = await prisma.user.findFirst({
-      where: {
-        id: req.user.id,
-      },
-    }); */
 });
 
 app.post("/api/v1/data/userdata", async (req: Request, res: Response) => {
@@ -402,6 +395,7 @@ app.post("/api/v1/auth/register", async (req: Request, res: Response) => {
         name,
         email,
         password: passwordHash,
+        displayName: name,
       },
     });
 
