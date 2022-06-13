@@ -11,6 +11,7 @@ import {
 import { AxiosResponse } from "axios";
 import Wrapper from "../../components/Wrapper";
 import isLoggedIn from "../../utils/requestUtils/isLoggedIn";
+import getBlogDataFromId from "../../utils/requestUtils/getBlogDataFromId";
 
 type Props = {
   blogTitle: string;
@@ -36,9 +37,24 @@ export default function Blog({ blogTitle, blogContent }: Props) {
       currentUserName={currentUserName}
       setCurrentUserName={setCurrentUsername}
     >
-      <Flex flexDir={"column"}>
+      <Center flexDir={"column"}>
         <Box> Blogview </Box>
-      </Flex>
+        <Text>{blogTitle}</Text>
+        <Text>{blogContent}</Text>
+      </Center>
     </Wrapper>
   );
 }
+
+Blog.getInitialProps = async (ctx) => {
+  const blogId = ctx.query.blog;
+  let blogTitle;
+  let blogContent;
+  const blogData = await getBlogDataFromId(blogId);
+  if (!blogData) {
+    return { blogTitle: "", blogContent: "" };
+  }
+  const blogJson = await blogData.data;
+  console.log(blogJson);
+  return { blogTitle: blogJson.title, blogContent: blogJson.content };
+};

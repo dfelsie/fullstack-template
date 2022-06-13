@@ -134,6 +134,19 @@ app.post(
   }
 );
 
+app.get("/api/v1/data/blogdata/", async (req: Request, res: Response) => {
+  const blogId = req.query.blogId;
+  console.log(blogId, "blogId");
+  if (!blogId || typeof blogId !== "string") return res.send("No blog id");
+  const blogIdNumber = parseInt(blogId);
+  const blogData = await prisma.post.findFirst({
+    where: {
+      id: blogIdNumber,
+    },
+  });
+  return res.json(blogData);
+});
+
 app.post(
   "/api/v1/data/userdatawithblogmetadata",
   async (req: Request, res: Response) => {
