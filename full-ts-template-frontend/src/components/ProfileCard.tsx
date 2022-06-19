@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Button,
   Center,
   Flex,
   Heading,
@@ -15,7 +16,6 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { useQuery } from "react-query";
 import Wrapper from "../components/Wrapper";
 import axios from "../utils/axios";
 import useIsLoggedIn from "../utils/requestUtils/isLoggedIn";
@@ -29,15 +29,22 @@ type Props = {
   userName: string;
   bio: string;
   userBlogList?: any[];
+  loggedInUserName?: string | null;
 };
 
 ProfileCard.defaultProps = {
   userName: "Default User",
   bio: "Default bio",
   userBlogList: [],
+  loggedInUserName: null,
 };
 
-export default function ProfileCard({ userName, bio, userBlogList }: Props) {
+export default function ProfileCard({
+  userName,
+  bio,
+  userBlogList,
+  loggedInUserName,
+}: Props) {
   //const { isLoading, data, error } = useIsLoggedIn();
   return (
     <Flex
@@ -52,7 +59,10 @@ export default function ProfileCard({ userName, bio, userBlogList }: Props) {
     >
       <Flex flexDir={"column"} alignItems={"center"}>
         <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
-        <Heading>{userName}</Heading>
+        <Flex>
+          <Heading>{userName}</Heading>
+          {loggedInUserName && <Button>Send Friend Request</Button>}
+        </Flex>
         <Heading>NVM It's Segun Adebayo</Heading>
       </Flex>
 
@@ -65,11 +75,11 @@ export default function ProfileCard({ userName, bio, userBlogList }: Props) {
             h="100px"
           >
             <Text>{bio}</Text>
+            <Button>Send Friend Request</Button>
           </Flex>
         </ListItem>
 
         <ListItem>
-          <Text>Yet More Wacky Facts!</Text>
           <List>
             {userBlogList.map((blog: any, index: number) => (
               <ListItem key={`blogItemNumber${index}`}>
