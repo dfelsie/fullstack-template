@@ -60,7 +60,8 @@ export default function ProfileCard({
         <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
         <Flex>
           <Heading>{userName}</Heading>
-          {loggedInUserName && <Button>Send Friend Request</Button>}
+          {loggedInUserName}
+          {loggedInUserName && <Button>Follow User</Button>}
         </Flex>
         <Heading>NVM It's Segun Adebayo</Heading>
       </Flex>

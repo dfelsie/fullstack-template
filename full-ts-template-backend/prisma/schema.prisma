@@ -58,7 +58,17 @@ model User {
 
   profile Profile?
 
-  friends         User[] @relation("friends")
-  friendsRelation User[] @relation("friends")
+  followers Follows[] @relation("following")
+  following Follows[] @relation("follower")
+  //  FollowersOfUser FollowersOfUser[]
+}
 
+model Follows {
+  follower    User     @relation(name: "follower", fields: [followerId], references: [id])
+  followerId  Int // relation scalar field (used in the `@relation` attribute above)
+  following   User     @relation(name: "following", fields: [followingId], references: [id])
+  followingId Int // relation scalar field (used in the `@relation` attribute above)
+  followedAt  DateTime @default(now())
+
+  @@id([followerId, followingId])
 }
