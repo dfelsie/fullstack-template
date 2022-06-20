@@ -17,6 +17,7 @@ import { default as NextLink } from "next/link";
 import sensitiveDataTest from "../../utils/test/sensitiveDataTest";
 import logout from "../../utils/requestUtils/logout";
 import { makeNavBody } from "./NavbarUtils";
+import { useRouter } from "next/router";
 
 type Props = {
   userName: String | null;
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export default function Navbar({ userName, setUserName }: Props) {
+  //const router = useRouter();
   return (
     <>
       <Flex

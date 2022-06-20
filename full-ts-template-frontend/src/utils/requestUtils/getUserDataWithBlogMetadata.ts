@@ -1,6 +1,12 @@
 import axios from "../axios";
 
-export default async function getUserDataWithBlogsMetadata(userName: string) {
+export default async function getUserDataWithBlogsMetadata(
+  userName: string | null
+) {
+  if (!userName) {
+    return null;
+  }
+
   const response = axios
     .post(`http://localhost:8000/api/v1/data/userdatawithblogmetadata`, {
       userName: userName,

@@ -21,19 +21,37 @@ export default function User({ userName }: Props) {
   //let userName: string;
   useEffect(() => {
     //userName = window.location.search.split("/")[2];
-    isLoggedIn().then((res: AxiosResponse) => {
-      //console.log(res);
-      if (res.data.name) {
-        setCurrentUsername(res.data.name);
-        getUserDataWithBlogsMetadata(userName).then((res: AxiosResponse) => {
-          if (res.data.blogs) {
-            console.log(res.data);
-            setUserBlogList(res.data.blogs);
-          }
-        });
-      }
+    (async () => {
+      const isLoggedInResponse = await isLoggedIn();
+      setCurrentUsername(
+        isLoggedInResponse ? isLoggedInResponse.data.name : null
+      );
+      const userDataWithBlogsMetadata = await getUserDataWithBlogsMetadata(
+        userName
+      );
+      setUserBlogList(
+        userDataWithBlogsMetadata ? userDataWithBlogsMetadata.data.blogs : []
+      );
+
       setRequestLoading(false);
-    });
+    })();
+    /* isLoggedIn()
+      .then((res: AxiosResponse) => {
+        //console.log(res);
+        if (res.data.name) {
+          setCurrentUsername(res.data.name);
+          getUserDataWithBlogsMetadata(userName).then((res: AxiosResponse) => {
+            if (res.data.blogs) {
+              console.log(res.data);
+              setUserBlogList(res.data.blogs);
+            }
+          });
+        }
+        //setRequestLoading(false);
+      })
+      .then(() => {
+        setRequestLoading(false);
+      }); */
   }, []);
   if (requestLoading) {
     return <></>;
@@ -45,11 +63,7 @@ export default function User({ userName }: Props) {
       setCurrentUserName={setCurrentUsername}
     >
       <ProfileCard
-        userName={
-          typeof useRouter().query.userName === "string"
-            ? (useRouter().query.userName as string)
-            : ""
-        }
+        userName={userName}
         userBlogList={userBlogList}
       ></ProfileCard>
     </Wrapper>

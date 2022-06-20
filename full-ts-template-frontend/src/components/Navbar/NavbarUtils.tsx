@@ -12,6 +12,7 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import Link from "next/link";
+import { NextRouter, useRouter } from "next/router";
 import logout from "../../utils/requestUtils/logout";
 import sensitiveDataTest from "../../utils/test/sensitiveDataTest";
 import ModalSigninForm from "../Forms/ModalSigninForm";
@@ -96,6 +97,7 @@ export function makeNavBody(
           onClick={() => {
             logout();
             setUserName(null);
+            //router.push("/");
           }}
         >
           Logout

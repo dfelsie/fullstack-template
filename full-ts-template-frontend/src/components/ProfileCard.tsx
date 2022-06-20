@@ -35,7 +35,6 @@ type Props = {
 ProfileCard.defaultProps = {
   userName: "Default User",
   bio: "Default bio",
-  userBlogList: [],
   loggedInUserName: null,
 };
 
@@ -66,7 +65,7 @@ export default function ProfileCard({
         <Heading>NVM It's Segun Adebayo</Heading>
       </Flex>
 
-      <List w={"50%"}>
+      <List w={"50%"} h={"80%"}>
         <ListItem>
           <Flex
             border={"1px solid grey"}
@@ -81,7 +80,7 @@ export default function ProfileCard({
 
         <ListItem>
           <List>
-            {userBlogList.map((blog: any, index: number) => (
+            {userBlogList.slice(0, 5).map((blog: any, index: number) => (
               <ListItem key={`blogItemNumber${index}`}>
                 <Link
                   key={`blogItemLink${index}`}
