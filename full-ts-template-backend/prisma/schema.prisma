@@ -64,10 +64,10 @@ model User {
 }
 
 model Follows {
-  follower    User     @relation(name: "follower", fields: [followerId], references: [id])
-  followerId  Int // relation scalar field (used in the `@relation` attribute above)
-  following   User     @relation(name: "following", fields: [followingId], references: [id])
-  followingId Int // relation scalar field (used in the `@relation` attribute above)
+  follower    User     @relation(name: "follower", fields: [followerId], references: [name])
+  followerId  String // relation scalar field (used in the `@relation` attribute above)
+  following   User     @relation(name: "following", fields: [followingId], references: [name])
+  followingId String // relation scalar field (used in the `@relation` attribute above)
   followedAt  DateTime @default(now())
 
   @@id([followerId, followingId])
