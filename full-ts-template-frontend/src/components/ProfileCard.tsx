@@ -24,18 +24,21 @@ import { EditIcon } from "@chakra-ui/icons";
 import ModalSigninForm from "../components/Forms/ModalSigninForm";
 import ModalEditTextForm from "../components/Forms/ModalEditTextForm";
 import Link from "next/link";
+import addFollow from "../utils/requestUtils/addFollow";
 
 type Props = {
   userName: string;
   bio: string;
   userBlogList?: any[];
   loggedInUserName?: string | null;
+  followingUser: boolean;
 };
 
 ProfileCard.defaultProps = {
   userName: "Default User",
   bio: "Default bio",
   loggedInUserName: null,
+  followingUser: false,
 };
 
 export default function ProfileCard({
@@ -43,7 +46,9 @@ export default function ProfileCard({
   bio,
   userBlogList,
   loggedInUserName,
+  followingUser,
 }: Props) {
+  const [isFollowing, setIsFollowing] = React.useState(followingUser);
   //const { isLoading, data, error } = useIsLoggedIn();
   return (
     <Flex
@@ -61,7 +66,15 @@ export default function ProfileCard({
         <Flex>
           <Heading>{userName}</Heading>
           {loggedInUserName}
-          {loggedInUserName && <Button>Follow User</Button>}
+          {loggedInUserName && (
+            <Button
+              onClick={() => {
+                addFollow(userName);
+              }}
+            >
+              Follow User
+            </Button>
+          )}
         </Flex>
         <Heading>NVM It's Segun Adebayo</Heading>
       </Flex>
@@ -75,7 +88,13 @@ export default function ProfileCard({
             h="100px"
           >
             <Text>{bio}</Text>
-            <Button>Send Friend Request</Button>
+            <Button
+              onClick={() => {
+                addFollow(userName);
+              }}
+            >
+              Send Friend Request
+            </Button>
           </Flex>
         </ListItem>
 

@@ -293,6 +293,34 @@ app.post("/api/v1/data/getblogs", async (req: Request, res: Response) => {
   res.json(blogs);
 });
 
+app.post("/api/v1/data/addfollow", async (req: Request, res: Response) => {
+  const currUserData = await getUserData(client);
+  if (!currUserData) return res.send("Not logged in");
+  const toFollowUserName = req.body.toFollowUserName;
+  const userToFollow = await prisma.user.findFirst({
+    where: {
+      name: toFollowUserName,
+    },
+  });
+  if (!userToFollow) return res.send("User not found");
+  const userToFollowId = userToFollow.id;
+  await prisma.follows.create({
+    data: {
+      follower: {
+        connect: {
+          id: currUserData.id,
+        },
+      },
+      following: {
+        connect: {
+          id: userToFollowId,
+        },
+      },
+    },
+  });
+  return res.send("Followed");
+});
+
 app.post("/api/v1/data/addblog", async (req: Request, res: Response) => {
   const currUserData = await getUserData(client);
   if (!currUserData) return res.send("Not logged in");
