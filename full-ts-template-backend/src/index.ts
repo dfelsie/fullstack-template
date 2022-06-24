@@ -147,11 +147,44 @@ app.get("/api/v1/data/blogdata/", async (req: Request, res: Response) => {
   return res.json(blogData);
 });
 
-app.post(
+/* app.post(
   "/api/v1/data/userdatawithblogmetadata",
   async (req: Request, res: Response) => {
     const userName = req.body.userName;
     console.log(req.body.userName);
+    if (!userName) return res.send("No user name");
+    const userData = await getUserData(client);
+    if (!userData) return res.send("Not logged in");
+    const blogs = await prisma.post.findMany({
+      where: {
+        authorName: {
+          equals: userName,
+        },
+      },
+    });
+    const blogsMetaData = blogs.map((blog) => {
+      return {
+        author: userData.name,
+        createdAt: blog.createdAt,
+        title: blog.title,
+        id: blog.id,
+      };
+    });
+
+    return res.json({
+      email: userData.email,
+      name: userData.name,
+      blogs: blogsMetaData,
+    });
+  }
+); */
+
+app.get(
+  "/api/v1/data/userdatawithblogmetadata/:username",
+  async (req: Request, res: Response) => {
+    //const userName = req.body.userName;
+    const userName = req.params.username as string;
+    console.log(userName, "userName");
     if (!userName) return res.send("No user name");
     const userData = await getUserData(client);
     if (!userData) return res.send("Not logged in");
@@ -303,17 +336,17 @@ app.post("/api/v1/data/addfollow", async (req: Request, res: Response) => {
     },
   });
   if (!userToFollow) return res.send("User not found");
-  const userToFollowId = userToFollow.id;
+  const userToFollowName = userToFollow.name;
   await prisma.follows.create({
     data: {
       follower: {
         connect: {
-          id: currUserData.id,
+          name: currUserData.name,
         },
       },
       following: {
         connect: {
-          id: userToFollowId,
+          name: userToFollowName,
         },
       },
     },
@@ -368,6 +401,27 @@ app.post("/api/v1/data/userdata", async (req: Request, res: Response) => {
   const userData = { name: user.name };
   res.json(userData);
 });
+app.get(
+  "/api/v1/data/userdata/:username",
+  async (req: Request, res: Response) => {
+    const userName = req.params.username as string;
+    if (!userName) {
+      res.status(400).send("Bad request");
+    }
+    const user = await prisma.user.findFirst({
+      where: {
+        name: userName,
+      },
+    });
+    if (!user) {
+      res.status(400).send("Bad request");
+      return;
+    }
+
+    const userData = { name: user.name };
+    res.json(userData);
+  }
+);
 
 app.post("/api/v1/auth/login", async (req: Request, res: Response) => {
   if (await checkLoggedIn(client)) return res.send("Already logged in");

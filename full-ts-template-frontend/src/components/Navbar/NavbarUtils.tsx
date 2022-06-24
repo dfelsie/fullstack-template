@@ -97,7 +97,7 @@ export function makeNavBody(
           onClick={() => {
             logout();
             setUserName(null);
-            //router.push("/");
+            useRouter().push("/");
           }}
         >
           Logout

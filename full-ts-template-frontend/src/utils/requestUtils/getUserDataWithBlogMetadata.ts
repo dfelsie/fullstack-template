@@ -7,10 +7,20 @@ export default async function getUserDataWithBlogsMetadata(
     return null;
   }
 
-  const response = axios
+  /*   const response = axios
     .post(`http://localhost:8000/api/v1/data/userdatawithblogmetadata`, {
       userName: userName,
     })
+    .then((res) => {
+      return res;
+    })
+    .catch((e) => {
+      console.log(e);
+    }); */
+  const response = axios
+    .get(
+      `http://localhost:8000/api/v1/data/userdatawithblogmetadata/${userName}`
+    )
     .then((res) => {
       return res;
     })

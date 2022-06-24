@@ -16,15 +16,17 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import Wrapper from "../components/Wrapper";
-import axios from "../utils/axios";
-import useIsLoggedIn from "../utils/requestUtils/isLoggedIn";
+import Wrapper from "../Wrapper";
+import axios from "../../utils/axios";
+import useIsLoggedIn from "../../utils/requestUtils/isLoggedIn";
 import { useRouter } from "next/router";
 import { EditIcon } from "@chakra-ui/icons";
-import ModalSigninForm from "../components/Forms/ModalSigninForm";
-import ModalEditTextForm from "../components/Forms/ModalEditTextForm";
+import ModalSigninForm from "../Forms/ModalSigninForm";
+import ModalEditTextForm from "../Forms/ModalEditTextForm";
 import Link from "next/link";
-import addFollow from "../utils/requestUtils/addFollow";
+import addFollow from "../../utils/requestUtils/addFollow";
+import CardInfoSwitcher from "./CardInfoSwitcher";
+import ProfileCardBody from "./ProfileCardBody";
 
 type Props = {
   userName: string;
@@ -41,6 +43,8 @@ ProfileCard.defaultProps = {
   followingUser: false,
 };
 
+const headerOptions = ["Follows", "Blogs", "Overview"];
+
 export default function ProfileCard({
   userName,
   bio,
@@ -50,6 +54,7 @@ export default function ProfileCard({
 }: Props) {
   const [isFollowing, setIsFollowing] = React.useState(followingUser);
   //const { isLoading, data, error } = useIsLoggedIn();
+  const [currInfoOpt, setCurrInfoOpt] = React.useState(0);
   return (
     <Flex
       m="auto"
@@ -63,20 +68,21 @@ export default function ProfileCard({
     >
       <Flex flexDir={"column"} alignItems={"center"}>
         <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
-        <Flex>
-          <Heading>{userName}</Heading>
-          {loggedInUserName}
-          {loggedInUserName && (
-            <Button
-              onClick={() => {
-                addFollow(userName);
-              }}
-            >
-              Follow User
-            </Button>
-          )}
-        </Flex>
-        <Heading>NVM It's Segun Adebayo</Heading>
+        <Heading>{userName}</Heading>
+        {loggedInUserName}
+        {loggedInUserName && (
+          <Button
+            onClick={() => {
+              addFollow(userName);
+            }}
+          >
+            Follow User
+          </Button>
+        )}
+        <CardInfoSwitcher
+          currentOptNum={currInfoOpt}
+          setOptNum={setCurrInfoOpt}
+        />
       </Flex>
 
       <List w={"50%"} h={"80%"}>
@@ -88,14 +94,14 @@ export default function ProfileCard({
             h="100px"
           >
             <Text>{bio}</Text>
-            <Button
-              onClick={() => {
-                addFollow(userName);
-              }}
-            >
-              Send Friend Request
-            </Button>
           </Flex>
+          <Button
+            onClick={() => {
+              addFollow(userName);
+            }}
+          >
+            Send Friend Request
+          </Button>
         </ListItem>
 
         <ListItem>
@@ -113,6 +119,7 @@ export default function ProfileCard({
           </List>
         </ListItem>
       </List>
+      <ProfileCardBody bodyType={headerOptions[currInfoOpt]} />
     </Flex>
   );
 }

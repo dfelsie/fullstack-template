@@ -2,7 +2,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import ProfileCard from "../../components/ProfileCard";
+import ProfileCard from "../../components/ProfileCard/ProfileCard";
 import Wrapper from "../../components/Wrapper";
 import getBlogPosts from "../../utils/requestUtils/getBlogPosts";
 import getUserDataWithBlogsMetadata from "../../utils/requestUtils/getUserDataWithBlogMetadata";
