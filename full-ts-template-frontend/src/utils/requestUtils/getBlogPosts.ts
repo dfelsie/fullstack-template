@@ -2,9 +2,7 @@ import axios from "../axios";
 
 export default async function getBlogPosts(userName: string) {
   const response = axios
-    .post(`http://localhost:8000/api/v1/data/getblogs`, {
-      userName: userName,
-    })
+    .get(`http://localhost:8000/api/v1/data/getuserblogs${userName}`)
     .then((res) => {
       return res;
     })

@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
+    "fake": "ts-node --esm src/fake.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,9 +27,11 @@
     "passport": "^0.5.3",
     "passport-local": "^1.0.0",
     "redis": "^4.1.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.3.0",
     "@types/connect-redis": "^0.0.18",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",

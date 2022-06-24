@@ -115,7 +115,27 @@ app.post(
   "/api/v1/data/userdatawithblogs",
   async (req: Request, res: Response) => {
     const userName = req.body.userName;
-    console.log(req.body.userName);
+    if (!userName) return res.send("No user name");
+    const userData = await getUserData(client);
+    if (!userData) return res.send("Not logged in");
+    const blogs = await prisma.post.findMany({
+      where: {
+        authorName: {
+          equals: userName,
+        },
+      },
+    });
+    return res.json({
+      email: userData.email,
+      name: userData.name,
+      blogs: blogs,
+    });
+  }
+);
+app.get(
+  "/api/v1/data/userdatawithblogs",
+  async (req: Request, res: Response) => {
+    const userName = req.params.username as string;
     if (!userName) return res.send("No user name");
     const userData = await getUserData(client);
     if (!userData) return res.send("Not logged in");
@@ -136,7 +156,6 @@ app.post(
 
 app.get("/api/v1/data/blogdata/", async (req: Request, res: Response) => {
   const blogId = req.query.blogId;
-  console.log(blogId, "blogId");
   if (!blogId || typeof blogId !== "string") return res.send("No blog id");
   const blogIdNumber = parseInt(blogId);
   const blogData = await prisma.post.findFirst({
@@ -151,7 +170,6 @@ app.get("/api/v1/data/blogdata/", async (req: Request, res: Response) => {
   "/api/v1/data/userdatawithblogmetadata",
   async (req: Request, res: Response) => {
     const userName = req.body.userName;
-    console.log(req.body.userName);
     if (!userName) return res.send("No user name");
     const userData = await getUserData(client);
     if (!userData) return res.send("Not logged in");
@@ -310,7 +328,42 @@ app.get("/api/v1/data/me", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/api/v1/data/getblogs", async (req: Request, res: Response) => {
+/* app.post("/api/v1/data/getuserblogs", async (req: Request, res: Response) => {
+  if (!req.body.userName || typeof req.body.userName !== "string") {
+    res.send("Please enter a userName");
+  }
+  const userName = req.body.userName;
+  const blogs = await prisma.post.findMany({
+    where: {
+      author: {
+        name: userName,
+      },
+    },
+    take: 10,
+  });
+  res.json(blogs);
+}); */
+
+app.get(
+  "/api/v1/data/getuserblogs/:username",
+  async (req: Request, res: Response) => {
+    const userName = req.params.username as string;
+    if (!userName) {
+      res.status(400).send("Bad request");
+    }
+    const blogs = await prisma.post.findMany({
+      where: {
+        author: {
+          name: userName,
+        },
+      },
+      take: 10,
+    });
+    res.json(blogs);
+  }
+);
+
+app.get("/api/v1/data/getblogs", async (req: Request, res: Response) => {
   if (!req.body.userName || typeof req.body.userName !== "string") {
     res.send("Please enter a userName");
   }
@@ -384,7 +437,7 @@ app.post("/api/v1/data/addblog", async (req: Request, res: Response) => {
   res.send(post).status(200);
 });
 
-app.post("/api/v1/data/userdata", async (req: Request, res: Response) => {
+/* app.post("/api/v1/data/userdata", async (req: Request, res: Response) => {
   if (!req.body.userName) {
     res.status(400).send("Bad request");
   }
@@ -400,7 +453,7 @@ app.post("/api/v1/data/userdata", async (req: Request, res: Response) => {
 
   const userData = { name: user.name };
   res.json(userData);
-});
+}); */
 app.get(
   "/api/v1/data/userdata/:username",
   async (req: Request, res: Response) => {
