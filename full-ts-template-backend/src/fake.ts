@@ -1,45 +1,59 @@
 import { faker } from "@faker-js/faker";
 import { PrismaClient, User, Post } from "@prisma/client";
-// import { faker } from '@faker-js/faker/locale/de';
+import argon2 from "argon2";
+
+/* import yargs, { Argv, number } from "yargs";
+const argv2 = yargs(process.argv.slice(2))
+  .option("num", {
+    type: "string",
+    demandOption: false,
+    requiresArg: false,
+  })
+  .parseSync();
+console.log(argv2.n);
+
+ */
+
 const prisma = new PrismaClient();
 
-function createRandomUser(): User {
+function createRandomUser(userNum: number): any {
+  // password: await argon2.hash(newPassword),
+
   return {
-    id: faker.datatype.number({ max: 10000000 }),
-    email: faker.internet.email(),
-    name: faker.internet.userName(),
+    //id: faker.datatype.number({ max: 10000000 }),
+    email: faker.internet.email() + userNum,
+    name: faker.internet.userName() + userNum,
     displayName: faker.name.firstName(),
     password: faker.internet.password(),
   };
 }
 
-async function createRandomPost(userAry: User[]): Promise<Post> {
-  return {
-    content: faker.lorem.paragraphs(),
-    createdAt: faker.datatype.datetime(),
-    id: faker.datatype.number({ max: 10000000 }),
-    published: false,
-    title: faker.address.city(),
-    updatedAt: new Date(),
-    authorName: faker.helpers.arrayElement(userAry).name,
-  };
-}
-
 async function users(num: number) {
-  const users: User[] = [];
-  Array.from({ length: num }).forEach(() => {
-    users.push(createRandomUser());
+  const users: any[] = [];
+  const numUserRecords = await prisma.user.count();
+  Array.from({ length: num }).forEach((_, index) => {
+    users.push(createRandomUser(numUserRecords + index));
   });
   let user: User;
   let numFollowers;
-  users.forEach((user, index, userAry) => {
-    numFollowers = Math.ceil(Math.random() * 5);
-    for (let i = 0; i < numFollowers; i++) {
-      prisma.follows.create({
+  await prisma.user.createMany({
+    data: users,
+  });
+  users.forEach(async (user, index, userAry) => {
+    const MAXNUMBERFOLLOWERS = 5;
+    numFollowers = Math.ceil(Math.random() * MAXNUMBERFOLLOWERS) + 1;
+    for (let i = 1; i <= numFollowers; i++) {
+      let follower = faker.helpers.arrayElement(
+        userAry.slice(
+          Math.floor((num / MAXNUMBERFOLLOWERS) * i),
+          (num / MAXNUMBERFOLLOWERS) * (i + 1)
+        )
+      );
+      await prisma.follows.create({
         data: {
           follower: {
             connect: {
-              name: faker.helpers.arrayElement(userAry).name,
+              name: follower.name,
             },
           },
           following: {
@@ -51,25 +65,42 @@ async function users(num: number) {
       });
     }
   });
-  await prisma.user.createMany({
-    data: users,
-  });
+}
+
+function createRandomPost(userAry: User[]): any {
+  return {
+    content: faker.lorem.paragraphs(),
+    published: false,
+    title: faker.address.city(),
+    authorName: faker.helpers.arrayElement(userAry).name,
+  };
 }
 
 async function posts(num: number) {
   const posts: Post[] = [];
   const dbUsers = await prisma.user.findMany();
-
-  Array.from({ length: num }).forEach(async () => {
-    posts.push(await createRandomPost(dbUsers));
-  });
-  prisma.post.createMany({
-    data: posts,
-  });
+  let postData;
+  for (let i = 0; i < num; i++) {
+    postData = createRandomPost(dbUsers);
+    await prisma.post.create({
+      data: {
+        title: postData.title,
+        content: postData.content,
+        published: postData.published,
+        author: {
+          connect: {
+            name: postData.authorName,
+          },
+        },
+      },
+    });
+  }
 }
 
 function clear() {
   prisma.user.deleteMany();
 }
+
+posts(100);
 
 //Add in a reset db function
