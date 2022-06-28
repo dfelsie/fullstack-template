@@ -205,7 +205,7 @@ app.get(
     console.log(userName, "userName");
     if (!userName) return res.send("No user name");
     const userData = await getUserData(client);
-    if (!userData) return res.send("Not logged in");
+    //if (!userData) return res.send("Not logged in");
     const blogs = await prisma.post.findMany({
       where: {
         authorName: {
@@ -215,7 +215,7 @@ app.get(
     });
     const blogsMetaData = blogs.map((blog) => {
       return {
-        author: userData.name,
+        author: userName,
         createdAt: blog.createdAt,
         title: blog.title,
         id: blog.id,
@@ -223,8 +223,8 @@ app.get(
     });
 
     return res.json({
-      email: userData.email,
-      name: userData.name,
+      //email: userData.email,
+      //name: userData.name,
       blogs: blogsMetaData,
     });
   }

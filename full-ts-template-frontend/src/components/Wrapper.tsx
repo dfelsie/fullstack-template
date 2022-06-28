@@ -15,7 +15,7 @@ export default function Wrapper({
   setCurrentUserName,
 }: Props) {
   return (
-    <Flex flexDir={"column"} h={"100vh"}>
+    <Flex flexDir={"column"} minH={"100vh"} h={"fit-content"} pos={"relative"}>
       <Navbar userName={currentUserName} setUserName={setCurrentUserName} />
       <Box h={"100%"} p={"2%"}>
         {children}
