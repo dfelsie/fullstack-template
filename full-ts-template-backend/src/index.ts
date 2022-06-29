@@ -166,6 +166,22 @@ app.get("/api/v1/data/blogdata/", async (req: Request, res: Response) => {
   return res.json(blogData);
 });
 
+app.get(
+  "/api/v1/data/checkifnameunique",
+  async (req: Request, res: Response) => {
+    const usernameToCheck = req.query.username;
+    if (!usernameToCheck || typeof usernameToCheck !== "string")
+      return res.send("No usernameToCheck");
+    //const blogIdNumber = parseInt(usernameToCheck);
+    const userWithSameName = await prisma.user.findFirst({
+      where: {
+        name: usernameToCheck,
+      },
+    });
+    return res.json({ usernameUnique: userWithSameName === null });
+  }
+);
+
 /* app.post(
   "/api/v1/data/userdatawithblogmetadata",
   async (req: Request, res: Response) => {
@@ -302,9 +318,22 @@ app.post(
 );
 
 app.get("/api/v1/data/userlist", (req: Request, res: Response) => {
+  console.log(req.query, "Params");
+  let page = req.query.page;
+  let limit = req.query.limit;
+  if (!(page || limit)) {
+    return res.send("Bad request");
+  }
+  let pageInt, limitInt;
+  pageInt = parseInt(page as string);
+  limitInt = parseInt(limit as string);
+  if (limitInt === NaN || pageInt === NaN) {
+    return res.send("Bad request");
+  }
   const userList = prisma.user
     .findMany({
-      take: 10,
+      take: limitInt,
+      skip: (pageInt - 1) * limitInt,
     })
     .then((userList) => {
       const userNameArray: string[] = [];

@@ -24,6 +24,16 @@ export default function ModalSignUpForm({ setUserName, closeModal }: Props) {
     return error;
   }
 
+  function validatePassword(password: string) {
+    let error;
+    if (!password) {
+      error = "Password required";
+    } else if (password.length < 6) {
+      error = "Password must be longer than 6 characters";
+    }
+    return error;
+  }
+
   return (
     <Formik
       initialValues={{ email: "", username: "", password: "" }}
@@ -74,7 +84,7 @@ export default function ModalSignUpForm({ setUserName, closeModal }: Props) {
             )}
           </Field>
           <Box my={2}>
-            <Field name="password">
+            <Field name="password" validate={validatePassword}>
               {({ field, form }) => (
                 <FormControl
                   isInvalid={form.errors.password && form.touched.password}

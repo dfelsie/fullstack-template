@@ -21,8 +21,8 @@ function createRandomUser(userNum: number): any {
 
   return {
     //id: faker.datatype.number({ max: 10000000 }),
-    email: faker.internet.email() + userNum,
-    name: faker.internet.userName() + userNum,
+    email: faker.internet.email().toLowerCase() + userNum,
+    name: faker.internet.userName().toLowerCase() + userNum,
     displayName: faker.name.firstName(),
     password: faker.internet.password(),
   };

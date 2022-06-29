@@ -8,6 +8,7 @@ import {
   List,
   ListItem,
   UnorderedList,
+  Button,
 } from "@chakra-ui/react";
 import Wrapper from "../components/Wrapper";
 import { AxiosResponse } from "axios";
@@ -55,6 +56,10 @@ export default function UserList({}: Props) {
             </ListItem>
           ))}
         </UnorderedList>
+        <Flex>
+          <Button>{"<<"}</Button>
+          <Button>{">>"}</Button>
+        </Flex>
       </Center>
     </Wrapper>
   );

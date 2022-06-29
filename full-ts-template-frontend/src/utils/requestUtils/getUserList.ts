@@ -1,8 +1,12 @@
 import axios from "../axios";
 
-const logout = async () => {
+const getUserList = async (page?: number, limit?: number) => {
+  const pageQuery = page ? page : 1;
+  const limitQuery = limit ? limit : 10;
   return await axios
-    .get("http://localhost:8000/api/v1/data/userlist")
+    .get(
+      `http://localhost:8000/api/v1/data/userlist?page=${pageQuery}&limit=${limitQuery}`
+    )
     .then((res) => {
       return res;
     })
@@ -11,4 +15,4 @@ const logout = async () => {
     });
 };
 
-export default logout;
+export default getUserList;
