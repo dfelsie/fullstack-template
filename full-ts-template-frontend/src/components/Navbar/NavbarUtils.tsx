@@ -22,6 +22,7 @@ export function makeNavBody(
   isLoggedIn: boolean,
   setUserName: (userName: string | null) => void
 ) {
+  const router = useRouter();
   if (!isLoggedIn) {
     const {
       isOpen: signupModalIsOpen,
@@ -97,7 +98,7 @@ export function makeNavBody(
           onClick={() => {
             logout();
             setUserName(null);
-            useRouter().push("/");
+            router.push("/");
           }}
         >
           Logout
